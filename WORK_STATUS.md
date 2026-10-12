@@ -66,7 +66,13 @@
   - 상위 목록 제목도 실제 개수로 표시 (상품 3개면 "매출 상위 3개")
   - 상품 1·3·5·6·7·9·10·12개에서 겹침이 없는지 테스트 추가 → 총 26개 테스트 통과
 - README.md 작성 (만든 이유, 기능, 기술, 실행 방법, AI와 작업한 방식, 배포 링크 자리)
-- git 저장소 생성은 보류: 이 PC에 git이 설치되어 있지 않음 → 사용자가 설치 후 진행
+
+### ✅ 8단계 — git 저장소 (2026-10-12)
+- 프로젝트를 `C:\Users\rkdeo\store-diagnosis`로 이동 (node_modules, dist 제외 복사)
+- `.gitignore` 보강: node_modules, dist, *.tsbuildinfo, .env / .env.*, 로그, 에디터·OS 파일, .claude/
+- 새 위치에서 `npm ci` → 테스트 26개 통과, 빌드 통과 확인
+- `git init -b main` 후 첫 커밋
+- ⏳ GitHub 원격 저장소 연결 및 push (사용자 GitHub 로그인 필요)
 
 ## 실행 방법
 ```
