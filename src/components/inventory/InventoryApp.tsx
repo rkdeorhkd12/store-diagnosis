@@ -85,7 +85,7 @@ export default function InventoryApp() {
       {step === 'result' && sheet && built && (
         <div className="stack">
           <ResultHead fileName={sheet.fileName} onEditMapping={() => setStep('mapping')} onReset={reset} />
-          <InventoryResult built={built} locationMapped={mapping?.location != null} />
+          <InventoryResult built={built} locationMapped={mapping?.location != null} sourceFile={sheet.fileName} />
         </div>
       )}
     </>

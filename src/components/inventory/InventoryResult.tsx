@@ -81,9 +81,12 @@ function compare(key: SortKey, a: InventoryItem, b: InventoryItem): number {
 export default function InventoryResult({
   built,
   locationMapped,
+  sourceFile,
 }: {
   built: InventoryBuildResult;
   locationMapped: boolean;
+  /** 엑셀 내려받기의 "판정 기준" 시트에 적는 원본 파일 이름 */
+  sourceFile: string;
 }) {
   const [criteria, setCriteriaState] = useState<InventoryCriteria>(loadCriteria);
   const [filter, setFilter] = useState<Verdict | 'all'>('all');
@@ -113,6 +116,27 @@ export default function InventoryResult({
     reorder: `부족 + 판매량 상위 ${formatCount(applied.topPercent)}%`,
     short: `${formatCount(applied.shortWeeks)}주치 미만`,
     soon: `${formatCount(applied.soonWeeks)}주치 미만`,
+  };
+
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+
+  /** 브라우저 안에서 xlsx를 만들어 바로 저장한다 (서버 전송 없음). */
+  const download = async () => {
+    setDownloading(true);
+    setDownloadError(null);
+    try {
+      const [XLSX, { buildReorderWorkbook, reorderFileName }] = await Promise.all([
+        import('xlsx'),
+        import('../../lib/exportReorder'),
+      ]);
+      const now = new Date();
+      XLSX.writeFile(buildReorderWorkbook(XLSX, diagnosis.items, applied, { sourceFile, now }), reorderFileName(now));
+    } catch {
+      setDownloadError('엑셀 파일을 만들지 못했습니다. 다시 시도해 주세요.');
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const pickFilter = (v: Verdict) => {
@@ -161,7 +185,18 @@ export default function InventoryResult({
       </section>
 
       <section className="card">
-        <h3>리오더 우선 {reorder.length > 0 && <span className="muted small">· 예상 소진일이 짧은 순</span>}</h3>
+        <div className="card-head card-head-wrap">
+          <h3>리오더 우선 {reorder.length > 0 && <span className="muted small">· 예상 소진일이 짧은 순</span>}</h3>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={download}
+            disabled={reorder.length === 0 || downloading}
+          >
+            {downloading ? '만드는 중…' : '⬇ 엑셀로 내려받기'}
+          </button>
+        </div>
+        {downloadError && <p className="error small">{downloadError}</p>}
         {reorder.length === 0 ? (
           <p className="muted small">
             판매량 상위 {formatCount(applied.topPercent)}% 상품 중 재고가 부족한 옵션이 없습니다. 위 판정 기준을
