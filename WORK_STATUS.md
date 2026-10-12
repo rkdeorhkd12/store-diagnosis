@@ -101,6 +101,15 @@
 - 브라우저 확인: 데스크톱·모바일(375px) 레이아웃, 툴팁 값, 주별·주문 수 전환
   - 주별 주문 수 평균이 7.5건인데 "8건"으로 반올림되던 것을 소수 한 자리로 수정
 
+### ✅ 12단계 — Vercel 자동 배포 복구 + 스크린샷 갱신 (2026-10-12)
+- 증상: 첫 Import 배포 이후 push로 시작된 배포 3건이 모두 실패 (README만 바꾼 커밋 포함)
+  - Vercel 화면: "Git information retrieval failed", 연결 설정: "GitHub fetch error - status: 403"
+  - 코드 문제 아님 (로컬 빌드·테스트 정상). Vercel ↔ GitHub 연결 권한 문제
+- 조치: 사용자가 GitHub의 Vercel 앱 권한 확인 후 Vercel에서 저장소 재연결
+- 확인: 빈 커밋 push → 자동 배포 성공, 배포 사이트에서 추이 차트·값 확인
+- README 스크린샷 다시 촬영 (열 매칭에 주문일시, 결과에 추이 차트), 모바일 추이 화면 추가 → 6장
+- 배포 실패를 빨리 알아채려면: GitHub 커밋 옆 체크 표시(Vercel 상태) 또는 Vercel 대시보드 확인
+
 ## 실행 방법
 ```
 cd store-diagnosis

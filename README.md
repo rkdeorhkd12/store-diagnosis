@@ -21,11 +21,13 @@
 <table>
   <tr>
     <th>모바일 · 요약</th>
+    <th>모바일 · 기간별 추이</th>
     <th>모바일 · 컬러별 비중</th>
   </tr>
   <tr>
-    <td align="center"><img src="docs/result-mobile.png" alt="모바일 진단 결과: 객단가, 상품 매출, 주문 수" width="300" /></td>
-    <td align="center"><img src="docs/color-mobile.png" alt="모바일 컬러별 판매 비중 도넛 차트" width="300" /></td>
+    <td align="center"><img src="docs/result-mobile.png" alt="모바일 진단 결과: 객단가, 상품 매출, 주문 수" width="250" /></td>
+    <td align="center"><img src="docs/trend-mobile.png" alt="모바일 기간별 매출 추이 막대 차트: 일별, 최고 일과 평균" width="250" /></td>
+    <td align="center"><img src="docs/color-mobile.png" alt="모바일 컬러별 판매 비중 도넛 차트" width="250" /></td>
   </tr>
 </table>
 
