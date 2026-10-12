@@ -1,6 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import * as XLSX from 'xlsx';
 import { describe, expect, it } from 'vitest';
 import { analyze } from '../analyze';
 import { guessMapping } from '../guessMapping';
@@ -8,17 +5,7 @@ import { isExcludedStatus, toNumber } from '../normalize';
 import { toParsedSheet } from '../parseFile';
 import { extractColor } from '../parseOption';
 import type { ColumnMapping, ParsedSheet } from '../../types';
-
-function loadSample(): ParsedSheet {
-  const text = readFileSync(resolve(__dirname, '../../../public/sample-orders.csv'), 'utf-8');
-  const wb = XLSX.read(text, { type: 'string', raw: true });
-  const matrix = XLSX.utils.sheet_to_json<unknown[]>(wb.Sheets[wb.SheetNames[0]], {
-    header: 1,
-    raw: false,
-    defval: '',
-  });
-  return toParsedSheet('sample-orders.csv', matrix);
-}
+import { loadSample } from './helpers';
 
 describe('toNumber', () => {
   it('금액 문자열을 숫자로 바꾼다', () => {
@@ -135,7 +122,7 @@ describe('analyze (샘플 데이터)', () => {
 
 describe('analyze (엣지 케이스)', () => {
   const mapping: ColumnMapping = {
-    orderId: 0, productName: 1, quantity: 2, amount: 3, option: null, status: null, amountMode: 'line',
+    orderId: 0, productName: 1, quantity: 2, amount: 3, option: null, status: null, orderDate: null, amountMode: 'line',
   };
 
   it('주문번호가 첫 줄에만 있으면 이어받는다', () => {

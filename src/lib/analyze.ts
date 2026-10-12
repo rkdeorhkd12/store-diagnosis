@@ -1,4 +1,5 @@
-import type { ColorStat, ColumnMapping, DiagnosisResult, ParsedSheet, ProductStat } from '../types';
+import type { ColorStat, ColumnMapping, DatedLine, DiagnosisResult, ParsedSheet, ProductStat } from '../types';
+import { parseDay } from './dates';
 import { isExcludedStatus, toNumber } from './normalize';
 import { extractColor, UNSPECIFIED_COLOR } from './parseOption';
 
@@ -39,12 +40,23 @@ export function analyze(sheet: ParsedSheet, mapping: ColumnMapping): DiagnosisRe
   let totalRevenue = 0;
   let totalQuantity = 0;
   let lastOrderId = '';
+  let lastDay: string | null = null;
+  const datedLines: DatedLine[] = [];
+  let undatedRows = 0;
 
   sheet.rows.forEach((row, i) => {
     // 병합 셀로 내보낸 엑셀은 주문번호가 첫 줄에만 있으므로 위 값을 이어받는다.
     const rawOrderId = row[col.orderId]?.trim() ?? '';
     const orderId = rawOrderId || lastOrderId || `__row_${i}`;
     if (rawOrderId) lastOrderId = rawOrderId;
+
+    // 주문일시도 같은 주문의 둘째 줄부터 비어 있으면 이어받는다.
+    let day: string | null = null;
+    if (mapping.orderDate !== null) {
+      const rawDate = row[mapping.orderDate]?.trim() ?? '';
+      day = rawDate ? parseDay(rawDate) : rawOrderId ? null : lastDay;
+      if (rawOrderId || rawDate) lastDay = day;
+    }
 
     if (mapping.status !== null && isExcludedStatus(row[mapping.status] ?? '')) {
       excludedByStatus++;
@@ -64,6 +76,11 @@ export function analyze(sheet: ParsedSheet, mapping: ColumnMapping): DiagnosisRe
     includedRows++;
     totalRevenue += revenue;
     totalQuantity += quantity;
+
+    if (mapping.orderDate !== null) {
+      if (day) datedLines.push({ day, orderId, revenue, quantity });
+      else undatedRows++;
+    }
 
     const p = products.get(name) ?? { name, revenue: 0, quantity: 0, orderCount: 0, orders: new Set() };
     p.revenue += revenue;
@@ -110,6 +127,8 @@ export function analyze(sheet: ParsedSheet, mapping: ColumnMapping): DiagnosisRe
     includedRows,
     excludedByStatus,
     skippedInvalid,
+    datedLines,
+    undatedRows,
     repeatedAmountSuspected: mapping.amountMode === 'line' && detectRepeatedAmount(orderLines),
   };
 }

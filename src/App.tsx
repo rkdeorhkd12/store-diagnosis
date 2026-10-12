@@ -3,6 +3,7 @@ import ColumnMapper from './components/ColumnMapper';
 import ColorShareChart from './components/ColorShareChart';
 import FileUpload from './components/FileUpload';
 import ProductRanking from './components/ProductRanking';
+import SalesTrendChart from './components/SalesTrendChart';
 import StepIndicator from './components/StepIndicator';
 import SummaryCards from './components/SummaryCards';
 import { analyze } from './lib/analyze';
@@ -107,6 +108,11 @@ export default function App() {
 
             <RowNotice result={result} statusMapped={mapping?.status != null} />
             <SummaryCards result={result} />
+            <SalesTrendChart
+              lines={result.datedLines}
+              undatedRows={result.undatedRows}
+              dateMapped={mapping?.orderDate != null}
+            />
             <ProductRanking
               title={`매출 상위 ${result.top5.length}개`}
               products={result.top5}

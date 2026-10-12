@@ -40,6 +40,10 @@ const RULES = {
     keywords: ['판매가', '판매단가', '상품가격', '상품가', '단가', 'price'],
     exclude: /결제|배송|할인|쿠폰|공급|원가|소비자|정가/,
   },
+  orderDate: {
+    keywords: ['주문일시', '주문일자', '주문일', '주문날짜', '주문시간', '결제일시', '결제일', 'orderdate', '일시', '날짜', 'date'],
+    exclude: /배송|발송|출고|입금|취소|반품|교환|환불|확정|정산|수정|생년/,
+  },
   status: {
     keywords: ['주문상태', '처리상태', '상품주문상태', '주문처리상태', '클레임상태', '상태', 'status'],
     exclude: /결제상태|배송상태|입금상태/,
@@ -77,6 +81,7 @@ function pick(headers: string[], rule: FieldRule, used: Set<number>): number | n
 export function guessMapping(headers: string[]): ColumnMapping {
   const used = new Set<number>();
   const orderId = pick(headers, RULES.orderId, used);
+  const orderDate = pick(headers, RULES.orderDate, used);
   const productName = pick(headers, RULES.productName, used);
   const quantity = pick(headers, RULES.quantity, used);
   const lineAmount = pick(headers, RULES.lineAmount, used);
@@ -90,6 +95,7 @@ export function guessMapping(headers: string[]): ColumnMapping {
     quantity,
     orderId,
     status,
+    orderDate,
     amount: lineAmount ?? unitPrice,
     amountMode: lineAmount === null && unitPrice !== null ? 'unitPrice' : 'line',
   };

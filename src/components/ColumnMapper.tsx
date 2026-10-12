@@ -2,7 +2,7 @@ import { missingRequired } from '../lib/analyze';
 import { guessAmountColumn } from '../lib/guessMapping';
 import type { AmountMode, ColumnMapping, ParsedSheet } from '../types';
 
-type FieldKey = 'orderId' | 'productName' | 'option' | 'quantity' | 'amount' | 'status';
+type FieldKey = 'orderId' | 'orderDate' | 'productName' | 'option' | 'quantity' | 'amount' | 'status';
 
 interface FieldDef {
   key: FieldKey;
@@ -13,6 +13,7 @@ interface FieldDef {
 
 const FIELDS: FieldDef[] = [
   { key: 'orderId', label: '주문번호', required: true, help: '객단가 계산에 쓰입니다. 같은 번호는 주문 1건으로 셉니다.' },
+  { key: 'orderDate', label: '주문일시', required: false, help: '기간별 매출 추이에 쓰입니다. 시간은 빼고 날짜만 봅니다.' },
   { key: 'productName', label: '상품명', required: true, help: '상품별 매출을 묶는 기준입니다.' },
   { key: 'option', label: '옵션(컬러·사이즈)', required: false, help: '컬러별 판매 비중에 쓰입니다. 없으면 차트가 비어 있습니다.' },
   { key: 'quantity', label: '수량', required: true, help: '판매 수량입니다.' },
@@ -40,7 +41,7 @@ export default function ColumnMapper({ sheet, mapping, onChange, onBack, onSubmi
 
   const setMode = (mode: AmountMode) => {
     if (mode === mapping.amountMode) return;
-    const taken = [mapping.orderId, mapping.productName, mapping.option, mapping.quantity, mapping.status];
+    const taken = [mapping.orderId, mapping.orderDate, mapping.productName, mapping.option, mapping.quantity, mapping.status];
     onChange({ ...mapping, amountMode: mode, amount: guessAmountColumn(sheet.headers, mode, taken) });
   };
 

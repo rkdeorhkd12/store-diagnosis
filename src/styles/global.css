@@ -529,6 +529,68 @@ select:focus-visible,
   background: var(--low);
 }
 
+.card-head-wrap {
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.segmented button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.trend-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
+  margin: 12px 0 8px;
+}
+.trend-stats div {
+  min-width: 0;
+}
+.trend-stats dt {
+  font-size: 13px;
+  color: var(--muted);
+}
+.trend-stats dd {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.trend-chart {
+  height: 220px;
+  margin: 0 -4px 8px;
+}
+@media (min-width: 720px) {
+  .trend-chart {
+    height: 260px;
+  }
+}
+.chart-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  font-variant-numeric: tabular-nums;
+}
+.trend-table summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+.trend-table .table-scroll {
+  margin-top: 8px;
+}
+.table-scroll td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
 .color-layout {
   display: grid;
   grid-template-columns: 1fr;

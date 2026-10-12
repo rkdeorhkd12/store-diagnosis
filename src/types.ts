@@ -20,7 +20,16 @@ export interface ColumnMapping {
   amount: number | null;
   orderId: number | null;
   status: number | null;
+  orderDate: number | null;
   amountMode: AmountMode;
+}
+
+/** 기간별 추이 집계용: 날짜를 읽을 수 있었던 집계 대상 줄 */
+export interface DatedLine {
+  day: string;
+  orderId: string;
+  revenue: number;
+  quantity: number;
 }
 
 export interface ProductStat {
@@ -52,6 +61,10 @@ export interface DiagnosisResult {
   excludedByStatus: number;
   /** 상품명·금액이 비어 있거나 숫자로 읽을 수 없어 건너뛴 줄 수 */
   skippedInvalid: number;
+  /** 주문일시 매칭 시, 날짜를 읽을 수 있었던 줄 (추이 차트용) */
+  datedLines: DatedLine[];
+  /** 주문일시를 매칭했지만 날짜를 읽지 못한 집계 대상 줄 수 */
+  undatedRows: number;
   /** 줄 금액이 주문 단위로 반복되는 것으로 보일 때 true */
   repeatedAmountSuspected: boolean;
 }

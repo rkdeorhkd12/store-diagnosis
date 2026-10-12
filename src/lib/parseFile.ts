@@ -77,17 +77,36 @@ export async function parseFile(file: File): Promise<ParsedSheet> {
 
   const workbook = isCsv
     ? XLSX.read(decodeCsv(buffer), { type: 'string', raw: true })
-    : XLSX.read(buffer, { type: 'array' });
+    : XLSX.read(buffer, { type: 'array', cellNF: true });
 
+  return workbookToParsedSheet(XLSX, workbook, file.name);
+}
+
+type XlsxModule = typeof import('xlsx');
+type WorkBook = import('xlsx').WorkBook;
+
+/** 첫 번째 시트를 문자열 2차원 배열로 바꾼다. */
+export function workbookToParsedSheet(XLSX: XlsxModule, workbook: WorkBook, fileName: string): ParsedSheet {
   const sheetName = workbook.SheetNames[0];
   if (!sheetName) throw new Error('시트를 찾을 수 없습니다.');
+  const sheet = workbook.Sheets[sheetName];
 
-  const matrix = XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets[sheetName], {
+  // 날짜 셀은 엑셀 서식대로면 "10/1/26"처럼 나와 순서가 모호하다.
+  // 일련번호에서 직접 YYYY-MM-DD HH:MM으로 바꿔 둔다 (시간대 영향 없음).
+  for (const [addr, cell] of Object.entries(sheet)) {
+    if (addr.startsWith('!') || cell.t !== 'n' || !cell.z || !XLSX.SSF.is_date(cell.z)) continue;
+    const p = XLSX.SSF.parse_date_code(cell.v as number);
+    if (!p) continue;
+    const pad = (n: number) => String(n).padStart(2, '0');
+    cell.w = `${p.y}-${pad(p.m)}-${pad(p.d)} ${pad(p.H)}:${pad(p.M)}`;
+  }
+
+  const matrix = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
     header: 1,
     raw: false,
     defval: '',
     blankrows: false,
   });
 
-  return toParsedSheet(file.name, matrix);
+  return toParsedSheet(fileName, matrix);
 }
