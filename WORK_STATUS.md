@@ -75,8 +75,15 @@
 - GitHub 공개 저장소 연결 및 push 완료: https://github.com/rkdeorhkd12/store-diagnosis
   (사용자가 Git Credential Manager로 직접 로그인)
 
+
+### ✅ 9단계 — Vercel 배포 (2026-10-12)
+- GitHub 저장소 연결 방식으로 배포: https://store-diagnosis.vercel.app (main에 push하면 자동 재배포)
+- 배포 사이트 검증: 샘플 데이터 결과가 로컬과 동일 (22줄 집계, 3줄 제외, 710,700원, 객단가 47,380원)
+- 네트워크 요청 확인: 사이트 자체 파일(GET)만 있음, 외부 전송 없음
+- 모바일(375px) 가로 넘침 없음
+- README 데모 링크 추가
+
 ## 다음 할 일
-- 배포 (Vercel 또는 GitHub Pages) 후 README의 데모 링크 채우기
 - README에 스크린샷 추가
 
 ## 실행 방법
