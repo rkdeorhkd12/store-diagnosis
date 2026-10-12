@@ -72,7 +72,12 @@
 - `.gitignore` 보강: node_modules, dist, *.tsbuildinfo, .env / .env.*, 로그, 에디터·OS 파일, .claude/
 - 새 위치에서 `npm ci` → 테스트 26개 통과, 빌드 통과 확인
 - `git init -b main` 후 첫 커밋
-- ⏳ GitHub 원격 저장소 연결 및 push (사용자 GitHub 로그인 필요)
+- GitHub 공개 저장소 연결 및 push 완료: https://github.com/rkdeorhkd12/store-diagnosis
+  (사용자가 Git Credential Manager로 직접 로그인)
+
+## 다음 할 일
+- 배포 (Vercel 또는 GitHub Pages) 후 README의 데모 링크 채우기
+- README에 스크린샷 추가
 
 ## 실행 방법
 ```
