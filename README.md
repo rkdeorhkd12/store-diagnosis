@@ -5,7 +5,29 @@
 
 **🔗 데모:** https://store-diagnosis.vercel.app — 첫 화면의 "샘플 데이터로 체험하기"를 누르면 바로 결과를 볼 수 있습니다.
 
-<!-- 스크린샷: docs/screenshot.png 추가 예정 -->
+![진단 결과 화면](docs/result-desktop.png)
+
+<table>
+  <tr>
+    <th>1. 업로드</th>
+    <th>2. 열 매칭</th>
+  </tr>
+  <tr>
+    <td><img src="docs/upload.png" alt="업로드 화면: 파일 선택, 외부 전송 없음 안내, 샘플 데이터 버튼" /></td>
+    <td><img src="docs/mapping.png" alt="열 매칭 화면: 6개 항목 자동 추천, 줄 금액 / 판매가×수량 선택" /></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <th>모바일 · 요약</th>
+    <th>모바일 · 컬러별 비중</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/result-mobile.png" alt="모바일 진단 결과: 객단가, 상품 매출, 주문 수" width="300" /></td>
+    <td align="center"><img src="docs/color-mobile.png" alt="모바일 컬러별 판매 비중 도넛 차트" width="300" /></td>
+  </tr>
+</table>
 
 ## 만든 이유
 

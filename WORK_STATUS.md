@@ -83,8 +83,10 @@
 - 모바일(375px) 가로 넘침 없음
 - README 데모 링크 추가
 
-## 다음 할 일
-- README에 스크린샷 추가
+### ✅ 10단계 — README 스크린샷 (2026-10-12)
+- 배포 사이트를 헤드리스 Chrome으로 촬영 (라이트 모드, 2배 해상도), `docs/`에 PNG 5장
+  - result-desktop (결과 전체), upload, mapping, result-mobile, color-mobile
+- README 상단에 결과 화면 + 업로드/열 매칭 표 + 모바일 2장 배치
 
 ## 실행 방법
 ```
