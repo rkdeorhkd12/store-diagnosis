@@ -4,7 +4,9 @@ const STEPS = [
   { key: 'result', label: '진단 결과' },
 ] as const;
 
-export default function StepIndicator({ current }: { current: (typeof STEPS)[number]['key'] }) {
+export type Step = (typeof STEPS)[number]['key'];
+
+export default function StepIndicator({ current }: { current: Step }) {
   const currentIdx = STEPS.findIndex((s) => s.key === current);
   return (
     <ol className="steps" aria-label="진행 단계">

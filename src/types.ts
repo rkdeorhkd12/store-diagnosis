@@ -32,6 +32,69 @@ export interface DatedLine {
   quantity: number;
 }
 
+/* ───────── 재고 진단 ───────── */
+
+/** 재고 표의 각 항목이 몇 번째 열인지. 매칭하지 않은 선택 항목은 null. */
+export interface InventoryMapping {
+  productName: number | null;
+  option: number | null;
+  /** 기간 판매량 (상위 N% 판단용) */
+  sales: number | null;
+  stock: number | null;
+  weeklySales: number | null;
+  location: number | null;
+}
+
+/** 리오더 우선 → 부족 → 소진임박 → 데이터 확인 필요 → 정상. 서로 겹치지 않는다. */
+export type Verdict = 'reorder' | 'short' | 'soon' | 'check' | 'ok';
+
+export interface InventoryCriteria {
+  /** 재고 < 주간 판매량 × shortWeeks 이면 부족 */
+  shortWeeks: number;
+  /** 재고 < 주간 판매량 × soonWeeks 이면 소진임박 */
+  soonWeeks: number;
+  /** 판매량 상위 몇 %를 리오더 우선 대상으로 볼지 */
+  topPercent: number;
+}
+
+/** 옵션(상품명+옵션) 단위로 합친 재고 한 줄 */
+export interface InventoryBase {
+  key: string;
+  productName: string;
+  option: string;
+  locations: string[];
+  sales: number;
+  stock: number;
+  weeklySales: number;
+  /** 원본에서 합쳐진 줄 수 (로케이션별로 나뉜 경우 2 이상) */
+  sourceRows: number;
+}
+
+export interface InventoryItem extends InventoryBase {
+  verdict: Verdict;
+  reason: string;
+  /** 재고 ÷ 주간 판매량 × 7. 주간 판매가 없거나 재고가 음수면 null */
+  daysLeft: number | null;
+  /** 판매량 순위 (1부터, 같은 판매량은 같은 순위) */
+  salesRank: number;
+  isTopSeller: boolean;
+}
+
+export interface InventoryBuildResult {
+  items: InventoryBase[];
+  /** 집계에 쓴 원본 줄 수 */
+  usedRows: number;
+  /** 상품명이 없거나 숫자를 읽을 수 없어 건너뛴 줄 수 */
+  skippedInvalid: number;
+}
+
+export interface InventoryDiagnosis {
+  items: InventoryItem[];
+  counts: Record<Verdict, number>;
+  /** 상위 N%에 드는 최소 판매량 (상위 판매 상품이 없으면 null) */
+  topThreshold: number | null;
+}
+
 export interface ProductStat {
   name: string;
   revenue: number;

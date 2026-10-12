@@ -1,6 +1,7 @@
 import { missingRequired } from '../lib/analyze';
 import { guessAmountColumn } from '../lib/guessMapping';
 import type { AmountMode, ColumnMapping, ParsedSheet } from '../types';
+import { MappingField, MappingShell } from './MappingShell';
 
 type FieldKey = 'orderId' | 'orderDate' | 'productName' | 'option' | 'quantity' | 'amount' | 'status';
 
@@ -33,12 +34,6 @@ interface Props {
 }
 
 export default function ColumnMapper({ sheet, mapping, onChange, onBack, onSubmit, error }: Props) {
-  const missing = missingRequired(mapping);
-  const sample = (col: number | null) => (col === null ? '' : sheet.rows.find((r) => r[col] !== '')?.[col] ?? '');
-
-  const setField = (key: FieldKey, value: string) =>
-    onChange({ ...mapping, [key]: value === '' ? null : Number(value) });
-
   const setMode = (mode: AmountMode) => {
     if (mode === mapping.amountMode) return;
     const taken = [mapping.orderId, mapping.orderDate, mapping.productName, mapping.option, mapping.quantity, mapping.status];
@@ -46,123 +41,58 @@ export default function ColumnMapper({ sheet, mapping, onChange, onBack, onSubmi
   };
 
   const amountHeader = mapping.amount !== null ? sheet.headers[mapping.amount] : '';
-  const amountLooksOrderLevel = ORDER_LEVEL_AMOUNT.test(amountHeader);
+  const amountHelp =
+    mapping.amountMode === 'line'
+      ? '상품 한 줄의 금액 열(예: 상품구매금액, 상품별 총 주문금액). 배송비·주문할인이 섞인 결제금액은 피하세요.'
+      : '상품 1개 가격(판매가) 열을 고르면 수량을 곱해 계산합니다.';
 
   return (
-    <section className="stack">
-      <div className="card stack">
-        <div>
-          <h2>열 매칭</h2>
-          <p className="muted small">
-            <strong>{sheet.fileName}</strong> · {sheet.rows.length.toLocaleString('ko-KR')}줄 ·{' '}
-            {sheet.headers.length}개 열. 열 이름을 보고 자동으로 추천했어요. 다르면 바꿔 주세요.
-          </p>
-        </div>
-
-        <div className="field-list">
-          {FIELDS.map((f) => (
-            <div className="field" key={f.key}>
-              <label className="field-label" htmlFor={`map-${f.key}`}>
-                {f.label}
-                <span className={f.required ? 'badge badge-req' : 'badge'}>{f.required ? '필수' : '선택'}</span>
-              </label>
-
-              {f.key === 'amount' && (
-                <div className="segmented" role="radiogroup" aria-label="상품금액 계산 방식">
+    <MappingShell
+      sheet={sheet}
+      missingCount={missingRequired(mapping).length}
+      onBack={onBack}
+      onSubmit={onSubmit}
+      error={error}
+    >
+      {FIELDS.map((f) => (
+        <MappingField
+          key={f.key}
+          id={f.key}
+          label={f.label}
+          required={f.required}
+          value={mapping[f.key]}
+          sheet={sheet}
+          help={f.key === 'amount' ? amountHelp : f.help}
+          onChange={(col) => onChange({ ...mapping, [f.key]: col })}
+          before={
+            f.key === 'amount' && (
+              <div className="segmented" role="radiogroup" aria-label="상품금액 계산 방식">
+                {(['line', 'unitPrice'] as const).map((m) => (
                   <button
+                    key={m}
                     type="button"
                     role="radio"
-                    aria-checked={mapping.amountMode === 'line'}
-                    className={mapping.amountMode === 'line' ? 'is-on' : ''}
-                    onClick={() => setMode('line')}
+                    aria-checked={mapping.amountMode === m}
+                    className={mapping.amountMode === m ? 'is-on' : ''}
+                    onClick={() => setMode(m)}
                   >
-                    줄 금액 열
+                    {m === 'line' ? '줄 금액 열' : '판매가 × 수량'}
                   </button>
-                  <button
-                    type="button"
-                    role="radio"
-                    aria-checked={mapping.amountMode === 'unitPrice'}
-                    className={mapping.amountMode === 'unitPrice' ? 'is-on' : ''}
-                    onClick={() => setMode('unitPrice')}
-                  >
-                    판매가 × 수량
-                  </button>
-                </div>
-              )}
-
-              <select
-                id={`map-${f.key}`}
-                value={mapping[f.key] ?? ''}
-                onChange={(e) => setField(f.key, e.target.value)}
-                className={f.required && mapping[f.key] === null ? 'is-missing' : ''}
-              >
-                <option value="">{f.required ? '— 열을 선택하세요 —' : '— 사용 안 함 —'}</option>
-                {sheet.headers.map((h, i) => (
-                  <option key={i} value={i}>
-                    {h}
-                  </option>
                 ))}
-              </select>
-
-              {mapping[f.key] !== null && (
-                <p className="field-sample small">
-                  예: <span>{sample(mapping[f.key]) || '(빈 값)'}</span>
-                </p>
-              )}
-
-              <p className="muted small">
-                {f.key === 'amount'
-                  ? mapping.amountMode === 'line'
-                    ? '상품 한 줄의 금액 열(예: 상품구매금액, 상품별 총 주문금액). 배송비·주문할인이 섞인 결제금액은 피하세요.'
-                    : '상품 1개 가격(판매가) 열을 고르면 수량을 곱해 계산합니다.'
-                  : f.help}
+              </div>
+            )
+          }
+          after={
+            f.key === 'amount' &&
+            ORDER_LEVEL_AMOUNT.test(amountHeader) && (
+              <p className="warn small">
+                "{amountHeader}"은(는) 주문 단위 금액일 수 있습니다. 줄마다 반복되거나 배송비가 섞이면 상품 매출이
+                부풀려집니다.
               </p>
-
-              {f.key === 'amount' && amountLooksOrderLevel && (
-                <p className="warn small">
-                  "{amountHeader}"은(는) 주문 단위 금액일 수 있습니다. 줄마다 반복되거나 배송비가 섞이면 상품 매출이
-                  부풀려집니다.
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <details className="card preview">
-        <summary>원본 미리보기 (앞 3줄)</summary>
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                {sheet.headers.map((h, i) => (
-                  <th key={i}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {sheet.rows.slice(0, 3).map((r, ri) => (
-                <tr key={ri}>
-                  {r.map((c, ci) => (
-                    <td key={ci}>{c}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </details>
-
-      {error && <p className="error">{error}</p>}
-
-      <div className="actions">
-        <button className="btn btn-ghost" onClick={onBack}>
-          다른 파일
-        </button>
-        <button className="btn btn-primary" onClick={onSubmit} disabled={missing.length > 0}>
-          {missing.length > 0 ? `필수 항목 ${missing.length}개 남음` : '진단하기'}
-        </button>
-      </div>
-    </section>
+            )
+          }
+        />
+      ))}
+    </MappingShell>
   );
 }
